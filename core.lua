@@ -13,6 +13,23 @@ if not Yahimod then
 	Yahimod = {}
 end
 
+local global = {}
+
+
+if next(SMODS.find_mod("Talisman")) then
+	Yahimod.hastalisman = true
+    print("Talisman found! Working on compatibility...")
+else
+    Yahimod.hastalisman = false
+    print("No talisman found. YAHIMOD will do things as usual")
+end
+
+function tNum(number) -- for talisman compat
+    local _numnum = number
+    if Yahimod.hastalisman == true then _numnum = to_big(number) end -- this just crashes so often wtf
+    return _numnum
+end
+
 G.C.YAHIPURPLE = HEX("d342fe")
 G.C.YAHIORANGE = HEX("ffd874")
 G.C.mid_flash = 0
@@ -37,6 +54,245 @@ Game.main_menu = function(change_context)
 		})
 	return ret
 end
+
+-- code borrowed (& modified) from NeatoJokers by LauraOnline!!
+
+SMODS.current_mod.description_loc_vars = function()
+	return { background_colour = G.C.CLEAR, text_colour = G.C.WHITE, scale = 1.4, shadow = true }
+end
+
+
+local creditspage = {
+        "Yahiamice",
+        "(mod author, 99% of the work)",
+		"",
+        "Lisnovski, Blake Andrews, violxiv",
+        "Art assets",
+		"",
+		"Nova_422, Sciman101",
+        "Code contributions",
+		"",
+		"meganeko",
+        "Cybergrind soundtrack",
+		"",
+        "HexaCryonic, Burssty",
+        "Playtesting",
+    }
+
+SMODS.current_mod.extra_tabs = function() --Credits tab
+    local scale = 0.5
+    return {
+        label = "Credits",
+        tab_definition_function = function()
+        return {
+            n = G.UIT.ROOT,
+            config = {
+            align = "cm",
+            padding = 0.05,
+            colour = G.C.CLEAR,
+            },
+            nodes = {
+            {
+                n = G.UIT.R,
+                config = {
+                padding = 0,
+                align = "cm"
+                },
+                nodes = {
+                {
+                    n = G.UIT.T,
+                    config = {
+                    text = "By Yahiamice",
+                    shadow = false,
+                    scale = scale*2,
+                    colour = G.C.PURPLE
+                    }
+                }
+                }
+            },
+            {
+                n = G.UIT.R,
+                config = {
+                padding = 0,
+                align = "cm"
+                },
+                nodes = {
+                {
+                    n = G.UIT.T,
+                    config = {
+                    text = "Some art assets by",
+                    shadow = false,
+                    scale = scale*0.66,
+                    colour = G.C.INACTIVE
+                    }
+                },
+                }
+            },
+            {
+                n = G.UIT.R,
+                config = {
+                    padding = 0,
+                    align = "cm"
+                },
+                nodes = {
+                    {
+                    n = G.UIT.T,
+                    config = {
+                        text = "Lisnovski, Blake Andrews, violxiv",
+                        shadow = false,
+                        scale = scale,
+                        colour = G.C.MONEY
+                    }
+                    },
+                }
+                },
+            {
+                n = G.UIT.R,
+                config = {
+                padding = 0,
+                align = "cm"
+                },
+                nodes = {
+                {
+                    n = G.UIT.T,
+                    config = {
+                    text = "Code contributions by",
+                    shadow = false,
+                    scale = scale*0.66,
+                    colour = G.C.INACTIVE
+                    }
+                }
+                },
+            },
+            {
+                n = G.UIT.R,
+                config = {
+                padding = 0,
+                align = "cm"
+                },
+                nodes = {
+                {
+                    n = G.UIT.T,
+                    config = {
+                    text = "Nova_422, Sciman101, enhancedrock",
+                    shadow = false,
+                    scale = scale,
+                    colour = G.C.GREEN
+                    }
+                }
+                } 
+            },
+            {
+                n = G.UIT.R,
+                config = {
+                padding = 0,
+                align = "cm"
+                },
+                nodes = {
+                {
+                    n = G.UIT.T,
+                    config = {
+                    text = "Music from",
+                    shadow = false,
+                    scale = scale*0.66,
+                    colour = G.C.INACTIVE
+                    }
+                }
+                } 
+            },
+            {
+                n = G.UIT.R,
+                config = {
+                padding = 0,
+                align = "cm"
+                },
+                nodes = {
+                {
+                    n = G.UIT.T,
+                    config = {
+                    text = "The Cyber Grind - meganeko / Buy Somethin' Will Ya - Earthbound / Game Corner - Pokemon Emerald",
+                    shadow = false,
+                    scale = scale*0.75,
+                    colour = G.C.RED
+                    }
+                }
+                } 
+            },
+			{
+                n = G.UIT.R,
+                config = {
+                padding = 0,
+                align = "cm"
+                },
+                nodes = {
+                {
+                    n = G.UIT.T,
+                    config = {
+                    text = "Special thanks:",
+                    shadow = false,
+                    scale = scale*0.66,
+                    colour = G.C.INACTIVE
+                    }
+                }
+                } 
+            },
+            {
+                n = G.UIT.R,
+                config = {
+                padding = 0,
+                align = "cm"
+                },
+                nodes = {
+                {
+                    n = G.UIT.T,
+                    config = {
+                    text = "Burssty & HexaCryonic for playtesting & the Cryptid Discord for help!",
+                    shadow = false,
+                    scale = scale*0.66,
+                    colour = G.C.BLUE
+                    }
+                }
+                } 
+            }
+            }
+        }
+        end
+    }
+end
+
+
+G.FUNCS.go_to_yahi_twitch = function(e)
+    love.system.openURL("https://twitch.tv/yahiamice")
+end
+G.FUNCS.go_to_yahi_yt = function(e)
+    love.system.openURL("https://youtube.com/yahiamicelive")
+end
+
+G.C.YAHIPURPLE = HEX("d342fe")
+G.C.YAHIORANGE = HEX("ffd874")
+G.C.mid_flash = 0
+G.C.vort_time = 7
+G.C.vort_speed = 0.4
+
+-- from cryptid :}
+local oldfunc = Game.main_menu
+Game.main_menu = function(change_context)
+	local ret = oldfunc(change_context)
+	G.SPLASH_BACK:define_draw_steps({
+			{
+				shader = "splash",
+				send = {
+					{ name = "time", ref_table = G.TIMERS, ref_value = "REAL_SHADER" },
+           			{name = 'vort_speed', val = G.C.vort_speed},
+            		{name = 'colour_1', ref_table = G.C, ref_value = 'YAHIPURPLE'},
+            		{name = 'colour_2', ref_table = G.C, ref_value = 'YAHIORANGE'},
+            		{name = 'mid_flash', ref_table = G.C, ref_value = 'mid_flash'},
+				},
+			},
+		})
+	return ret
+end
+
 
 
 local mod_path = "" .. SMODS.current_mod.path
