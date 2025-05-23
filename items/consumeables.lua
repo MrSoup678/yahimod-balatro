@@ -209,6 +209,7 @@ SMODS.Consumable({
 -- fish
 
 SMODS.Sound({key = "fish", path = "fish.ogg",})
+SMODS.Sound({key = "fishloud", path = "fishloud.ogg",})
 
 SMODS.Consumable({
     key = "yahimod_fish",
@@ -231,8 +232,14 @@ SMODS.Consumable({
     hidden = true,
 
     use = function(self, card, area, copier)
+        if G.GAME.blind and G.GAME.blind.name == 'boss_fish' then
+        G.showfish = 170*3
+        play_sound("yahimod_fishloud")
+        check_for_unlock({ type = "ach_stanleymovref" })
+        else
         G.showfish = 170
         play_sound("yahimod_fish")
+        end
     end,
 
     can_use = function(self, card)
@@ -438,7 +445,7 @@ SMODS.Consumable {
         return {vars = {(card.ability or self.config).max_highlighted}}
     end,
     loc_txt = {
-        name = 'Vampire',
+        name = 'Vampirify',
         text = {
             "Select {C:attention}#1#{} card to",
             "turn {C:red}Evil{}"
@@ -612,6 +619,7 @@ SMODS.Consumable({
     use = function(self, card, area, copier)
         if pseudorandom('yahimod_fortune') < (G.GAME.probabilities.normal / card.ability.chance) then
             play_sound("yahimod_jackpot")
+            check_for_unlock({ type = "ach_fortune" })
             ease_dollars(1000000)
         else
             G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
@@ -686,3 +694,17 @@ SMODS.Consumable {
         G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.2,func = function() G.hand:unhighlight_all(); return true end }))
     end
 }
+
+-- reset open to lan on run restart (and other variables)
+local _startrunhook = Game.start_run
+function Game:start_run(args)
+    _startrunhook(self, args)
+    if G.SETTINGS.GAMESPEED == 0.25 then G.SETTINGS.GAMESPEED = 1 end
+    if G.wiwidestroyed and G.wiwidestroyed ~= 0 then G.wiwidestroyed = 0 end
+
+    if G.opentolan_canspawn == true then
+        G.opentolan_phase_ex = 2
+        G.opentolan_phase = Yahimod.ticks
+        G.opentolan_canspawn = false
+    end
+end

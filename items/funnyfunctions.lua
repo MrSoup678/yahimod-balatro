@@ -13,6 +13,15 @@ function everythingRedSteelKing()
 	end
 end
 
+function oneCard()
+	for _, card in ipairs(G.playing_cards) do
+			if card ~= G.playing_cards[1] then 
+			card:start_dissolve()
+			card = nil
+			end
+	end
+end
+
 -- this one isn't funny, it's a tool! wow!!! you've been tricked into learning about bounding boxes!!
 function BoundingBox(x1, y1, x2, y2, tx, ty)
 	return	(x2 >= tx and y2 >= ty)

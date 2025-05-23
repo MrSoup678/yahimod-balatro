@@ -54,6 +54,12 @@ SMODS.Blind {
     end,
 }
 
+function resetHorsery() -- necessary to prevent after effects lingering on
+    G.SETTINGS.play_button_pos = G.SETTINGS.play_button_pos_backup
+    G.SETTINGS.play_button_pos_backup = nil 
+
+end
+
 SMODS.Blind {
     name = "boss_horse",
     key = "boss_horse",
@@ -82,17 +88,20 @@ SMODS.Blind {
     end,
 
     defeat = function(self)
-       if G.ARGS.chip_flames.real_intensity > 0.000001 then
+       resetHorsery()
+       
+        if G.ARGS.chip_flames.real_intensity > 0.000001 then
             addHorse()
             G.FUNCS.overlay_menu{
                 definition = create_UIBox_custom_video1("horsef","Hell Yeah"),
                 config = {no_esc = true}
             }
-       end
+        end
     end,
 
 
 }
+
 
 SMODS.Blind {
     name = "boss_vibe",
@@ -289,6 +298,7 @@ SMODS.Blind {
     end,
 
     defeat = function(self)
+        resetHorsery()
        if G.ARGS.chip_flames.real_intensity > 0.000001 then
             addHorse()
        end
@@ -338,17 +348,23 @@ SMODS.Blind {
     
     calculate = function(self, card, context)
         
-        if context.cardarea == G.play and context.individual and context.other_card then
+        if context.before then
             
             local handname = context.scoring_name
             local handplayed = (G.GAME.hands[handname].played or 0)
             local mostplayed = 0
+            local handnamemostplayed = 0 -- debugging purposes
 
             for k, v in pairs(G.GAME.hands) do 
-                if G.GAME.hands[k].played > mostplayed then mostplayed = G.GAME.hands[k].played end
+                if G.GAME.hands[k].played > mostplayed and k ~= handname then 
+                    mostplayed = G.GAME.hands[k].played 
+                    handnamemostplayed = k
+                end
+                
             end
+            --print("current played hand: " .. handnamemostplayed .. " with plays: ".. mostplayed)
 
-            if G.GAME.hands[handname].played >= mostplayed then crashGame() end
+            if (G.GAME.hands[handname].played) > (mostplayed) then crashGame() end
         end
     end,
         
@@ -378,7 +394,7 @@ SMODS.Blind {
 
     
     calculate = function(self, card, context)
-        if context.cardarea == G.play and context.individual and context.other_card then
+        if context.cardarea == G.play and context.individual and context.other_card and not G.GAME.blind.disabled then
             local handname = context.scoring_name
             if handname ~= "High Card" then forceGameover() end
         end

@@ -22,6 +22,11 @@ return {
                         },
                         
             },
-            
+           
     },
+    misc = {
+            poker_hands = {
+                test_jerma = "jerma loc txt",
+            },
+        },
 }
