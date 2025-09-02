@@ -90,7 +90,7 @@ SMODS.Blind {
     defeat = function(self)
        resetHorsery()
        
-        if G.ARGS.chip_flames.real_intensity > 0.000001 then
+        if beatInOneHand() then
             addHorse()
             G.FUNCS.overlay_menu{
                 definition = create_UIBox_custom_video1("horsef","Hell Yeah"),
@@ -299,7 +299,7 @@ SMODS.Blind {
 
     defeat = function(self)
         resetHorsery()
-       if G.ARGS.chip_flames.real_intensity > 0.000001 then
+       if beatInOneHand() > 0.000001 then
             addHorse()
        end
        G.FUNCS.overlay_menu{

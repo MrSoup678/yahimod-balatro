@@ -181,7 +181,7 @@ SMODS.Consumable({
 	atlas = "atlas_yahimod_consumeables",
     unlocked = true,
     cost = 4,
-    hidden = true,
+    hidden = false,
 
     config = { extra = {dollaramt = 10}},
 
@@ -229,7 +229,7 @@ SMODS.Consumable({
 	atlas = "atlas_yahimod_consumeables",
     unlocked = true,
     cost = 4,
-    hidden = true,
+    hidden = false,
 
     use = function(self, card, area, copier)
         if G.GAME.blind and G.GAME.blind.name == 'boss_fish' then

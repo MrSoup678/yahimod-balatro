@@ -1004,7 +1004,7 @@ SMODS.Joker{
             card.ability.extra.chat = false
         end
 		if context.end_of_round and (G.GAME.blind:get_type() == 'Boss') and (card.ability.extra.triggered == false) then
-            if G.ARGS.chip_flames.real_intensity < 0.000001 then
+            if beatInOneHand() == false then
                 ease_ante(-1)
                 card_eval_status_text(card,'extra',nil,nil,nil,{message = "Hee-Hee!"})
                 card:start_dissolve({G.C.RED})
@@ -2032,7 +2032,7 @@ SMODS.Joker{
     key = 'drwhatsapp',
     loc_txt= {
         name = 'Dr. Whatsapp',
-        text = { "Retriggers all {C:green}Whatsapp Seals{} twice",
+        text = { "Retriggers scored {C:green}Whatsapp Seals{} twice",
                     "If your first hand contains",
                     "{C:attention}only{} one card, applies",
                     "a {C:green}Whatsapp Seal{} to it",
@@ -2996,7 +2996,7 @@ SMODS.Joker{
         name = 'Half-Blueprint',
         text = { "Copies ability of",
                     "{C:attention}Joker{} to the right",
-                    "{C:green}#1# out of #2#{} times{}"}
+                    "{C:green}#3# out of #2#{} times{}"}
     },
     atlas = 'halfblueprint',
     rarity = 2,
@@ -3012,17 +3012,17 @@ SMODS.Joker{
     perishable_compat = true,
 
     pos = {x=0, y= 0},
-    config = { extra = { mainodds = 1, totalodds = 2, bptarget = 0 } },
+    config = { extra = { mainodds = 1, totalodds = 2, bptarget = 0, chance = 2} },
 
     loc_vars = function(self, info_queue, center)
-        return { vars = { center.ability.extra.mainodds, center.ability.extra.totalodds}  }
+        return { vars = { center.ability.extra.mainodds, center.ability.extra.totalodds, G.GAME.probabilities.normal }  }
 	end,
 
     calculate = function(self, card, context)
         local _myid = getJokerID(card)
         if G.jokers.cards[_myid + 1] then card.ability.extra.bptarget = G.jokers.cards[_myid + 1] end
 
-        if math.random(card.ability.extra.mainodds,card.ability.extra.totalodds) == 1 and context.retrigger_joker_check and not context.retrigger_joker and context.other_card ~= self then
+        if pseudorandom('halfblueprint') < (G.GAME.probabilities.normal / card.ability.extra.totalodds) and context.retrigger_joker_check and not context.retrigger_joker and context.other_card ~= self then
             if context.other_card == G.jokers.cards[getJokerID(card) + 1] then
                 return {
                     repetitions = 1,
@@ -3481,7 +3481,7 @@ SMODS.Joker{
                 discard_UI.config.object:update()
                 G.HUD:recalculate()
                     attention_text({
-                    text = text..mod,
+                    text = "+1",
                     scale = 0.8, 
                     hold = 0.7,
                     cover = discard_UI.parent,
@@ -3489,7 +3489,7 @@ SMODS.Joker{
                     align = 'cm',
                     })
                     attention_text({
-                    text = text..mod,
+                    text = "+1",
                     scale = 0.8, 
                     hold = 0.7,
                     cover = hand_UI.parent,
@@ -3699,7 +3699,7 @@ SMODS.Atlas{
 
 -- ultrakill coin click check
 userHasClicked = function(x,y)
-    if G.coinout then
+    if G.coinout and G.coinout.clickabletimer == 0 then
         local _card = nil
         for i = 1, #G.jokers.cards do
             if G.jokers.cards[i].ability.name == 'j_yahimod_ultrakill' then
@@ -3809,7 +3809,7 @@ G.FUNCS.play_cards_from_highlighted = function(e)
     --print("hooked!")
     if jokerExists("j_yahimod_ultrakill") then
         for i = 1, #G.jokers.cards do
-            if G.jokers.cards[i].ability.name == 'j_yahimod_ultrakill' then 
+            if G.jokers.cards[i].ability.name == 'j_yahimod_ultrakill' and G.jokers.cards[i].debuff == false then 
                 _joker = G.jokers.cards[i]
                 _trig = true
             end
@@ -3868,6 +3868,7 @@ end
 -- Hook so stuff is reset after finishing scoring
 local hook = G.FUNCS.evaluate_play
 G.FUNCS.evaluate_play = function(e)
+
     hook(e)
     G.coinout = nil
     G.hascoinbeenthrown = nil
@@ -3875,6 +3876,7 @@ G.FUNCS.evaluate_play = function(e)
     G.hascoinbeenhit = nil
     G.haltevaleventsent = nil
     G.haltingevaluation = nil
+
 end,
 
 
@@ -3967,6 +3969,12 @@ function throwCoin(posx,posy)
     G.coinout.y = posy
     G.coinout.yvel = 1
     G.coinout.xvel = math.random(-5,5)
+    G.coinout.clickabletimer = 0
+
+    if G.SETTINGS.GAMESPEED <= 1 then
+        G.coinout.yvel = 2
+        G.coinout.clickabletimer = 72/G.SETTINGS.GAMESPEED
+    end
 
     G.coinout.prevx = {}
     G.coinout.prevy = {}
@@ -4268,7 +4276,7 @@ SMODS.Joker{
         
 
 
-        if G.GAME.blind and string.len(G.GAME.blind.name) > 0 then G.FUNCS.homophobiacheck() end
+        if G.GAME.blind and string.len(G.GAME.blind.name) > 0 and self.debuff == false then G.FUNCS.homophobiacheck() end
     end,
 
     remove_from_deck = function(self, card, from_debuff)
@@ -4279,7 +4287,7 @@ SMODS.Joker{
 	end,
 
     calculate = function(self, card, context)
-        if context.setting_blind then
+        if context.setting_blind and card.debuff == false then
             if isEven(G.GAME.round+1) then -- it's +1 cuz the round number doesn't update until after we init this
                 card.ability.extra.oldhandsize = G.hand.config.card_limit
                 G.GAME.current_round.hands_left = G.GAME.current_round.hands_left + card.ability.extra.hand
@@ -5189,7 +5197,8 @@ SMODS.Joker{
         name = 'Moon',
         text = { "If your hand contains {C:attention}5 cards,",
                     "changes the {C:attention}suit{} of the {C:red}last",
-                    "card to that of the {C:green}first{} card",}
+                    "card to that of the {C:green}first{} card",
+                    "{C:inactive}(Does not change scoring)",}
     },
     atlas = 'moon',
     rarity = 2,
@@ -5199,9 +5208,9 @@ SMODS.Joker{
     
     unlocked = true,
     discovered = true,
-    blueprint_compat = true,
-    eternal_compat = false,
-    perishable_compat = false,
+    blueprint_compat = false,
+    eternal_compat = true,
+    perishable_compat = true,
 
     pos = {x=0, y= 0},
     config = { extra = {multamt = 2, multtotal = 0}},
@@ -5289,7 +5298,68 @@ SMODS.Joker{
     end,
 }
 
+-- Completionist
+SMODS.Atlas{
+    key = 'completionist',
+    path = 'completionist.png',
+    px = 71,
+    py = 96,
+}
 
+SMODS.Joker{
+    key = 'completionist',
+    loc_txt= {
+        name = 'The Completionist',
+        text = { "{X:mult,C:white}X#2#{} Mult",
+                    "for every {C:attention}achievement{}",
+                    "obtained",
+                    "{C:inactive}(Currently {X:mult,C:white}X#1#{} {C:inactive}Mult)"}
+    },
+    atlas = 'completionist',
+    rarity = 3,
+    cost = 10,
+    pools = { ["Yahimodaddition"] = true },
+    
+    
+    unlocked = true,
+    discovered = true,
+    blueprint_compat = false,
+    eternal_compat = false,
+    perishable_compat = false,
+
+    pos = {x=0, y= 0},
+    config = { extra = {xmult = 1, xmultadd = 0.15}},
+    
+    loc_vars = function(self, info_queue, center)
+		return { vars = { center.ability.extra.xmult, center.ability.extra.xmultadd}  }
+	end,
+
+    update = function(self, card, dt)
+        if G.jokers then
+            local achamount = calculate_achievements() or 0
+            Xmult_mod = (card.ability.extra.xmultadd * achamount)
+            card.ability.extra.xmult = 1+Xmult_mod
+        end
+    end,
+
+    calculate = function(self, card, context)
+    if context.joker_main then
+        return {
+            color = G.C.RED,
+            message = "x".. card.ability.extra.xmult,
+            Xmult_mod = card.ability.extra.xmult
+        }
+        end
+    end,
+
+
+    check_for_unlock = function(self, args)
+        if args.type == 'test' then --not a real type, just a joke
+            unlock_card(self)
+        end
+        unlock_card(self) --unlocks the card if it isnt unlocked
+    end,
+}  
 
 
 
@@ -5561,6 +5631,11 @@ function decrementingTickEvent(type,tick)
     --ultrakill coin
     if type == "G.coinout" and math.fmod(Yahimod.ticks,2) == 0 then
 
+        -- vibe stuff
+        if G.coinout.clickabletimer > 0 then 
+           G.coinout.clickabletimer = G.coinout.clickabletimer - 1
+        end
+
         if #G.coinout.prevx > 5 then 
             table.remove(G.coinout.prevx,1)
             table.remove(G.coinout.prevy,1)
@@ -5569,11 +5644,25 @@ function decrementingTickEvent(type,tick)
         table.insert(G.coinout.prevy,G.coinout.y)
         
 
-        G.coinout.x = G.coinout.x + G.coinout.xvel
-        G.coinout.y = G.coinout.y + G.coinout.yvel
+        
+        
+        if G.SETTINGS.GAMESPEED <= 1 then
+            G.coinout.x = G.coinout.x + G.coinout.xvel*G.SETTINGS.GAMESPEED*0.5
+            G.coinout.y = G.coinout.y + G.coinout.yvel*G.SETTINGS.GAMESPEED*0.5
+        else
+            G.coinout.x = G.coinout.x + G.coinout.xvel
+            G.coinout.y = G.coinout.y + G.coinout.yvel
+        end
+        
+
+
 
         if G.coinout.yvel < 45 and math.fmod(Yahimod.ticks,3) == 0 then
-            G.coinout.yvel = G.coinout.yvel + 1
+            if G.SETTINGS.GAMESPEED <= 1 then
+                G.coinout.yvel = G.coinout.yvel + G.SETTINGS.GAMESPEED/2
+            else
+                G.coinout.yvel = G.coinout.yvel + 1
+            end
         end
 
         if G.coinout.y > love.graphics.getHeight()*1.2 then
@@ -5744,9 +5833,15 @@ function Game:update(dt)
     
     
     if G.GAME.blind and not G.GAME.blind.disabled and G.GAME.blind.in_blind and G.GAME.blind.name == 'boss_vibe' then
-        G.SETTINGS.GAMESPEED = 0.25
+
+        local _gspeed = 0.25
+        if jokerExists("j_yahimod_ultrakill") then
+            _gspeed = 0.25
+        end 
+
+        G.SETTINGS.GAMESPEED = _gspeed
         else
-        if G.GAME.normalgamespeed == nil and G.SETTINGS.GAMESPEED ~= 0.25 then G.GAME.normalgamespeed = G.SETTINGS.GAMESPEED end
+        if G.GAME.normalgamespeed == nil and G.SETTINGS.GAMESPEED ~= _gspeed then G.GAME.normalgamespeed = G.SETTINGS.GAMESPEED end
     end
     
 
@@ -5916,15 +6011,20 @@ function love.draw()
         local _he = 50 * math.max(3,     (1/(_btm - G.coinout.y - 100)*love.graphics.getHeight()))
         local _thin = math.max(2,24*((G.coinout.y-100)/_btm))
 
-        local _staralpha = math.min(88,100*((G.coinout.y-100)/_btm))/100
+        if G.coinout.clickabletimer == 0 then
+            local _staralpha = math.min(88,100*((G.coinout.y-100)/_btm))/100
 
-        local _starpoints = { _cx,_cy-_thin,     _cx+_wi,_cy-_he,    _cx+_thin,_cy,      _cx+_wi,_cy+_he,    _cx,_cy+_thin,    _cx-_wi,_cy+_he,    _cx-_thin,_cy,   _cx-_wi,_cy-_he,  _cx,_cy-_thin  }
-        
-        love.graphics.setColor(255, 230, 0, _staralpha)
-        love.graphics.polygon( "fill", _starpoints )
+            local _starpoints = { _cx,_cy-_thin,     _cx+_wi,_cy-_he,    _cx+_thin,_cy,      _cx+_wi,_cy+_he,    _cx,_cy+_thin,    _cx-_wi,_cy+_he,    _cx-_thin,_cy,   _cx-_wi,_cy-_he,  _cx,_cy-_thin  }
+            
+            
+            love.graphics.setColor(255, 230, 0, _staralpha)
+            love.graphics.polygon( "fill", _starpoints )
+            love.graphics.setColor(1, 1, 1, 1)
+        else
+            love.graphics.setColor(1, 1, 1, 0.25)
+        end
 
         local _imgindex = math.fmod(Yahimod.ticks, 4) + 1
-        love.graphics.setColor(1, 1, 1, 1)
         love.graphics.draw(Yahimod.coinimage, Yahimod.coinsprite[_imgindex], G.coinout.x, G.coinout.y,math.fmod(Yahimod.ticks, 360),_xscale,_yscale,32*_xscale,32*_yscale)
 
     end
@@ -5993,6 +6093,14 @@ function love.draw()
         if Yahimod.fishpng == nil then Yahimod.fishpng = loadThatFuckingImage("fishondafloo.png") end
         love.graphics.setColor(1, 1, 1, 1) 
         love.graphics.draw(Yahimod.fishpng, 0*_xscale*2, 0*_yscale*2,0,_xscale*2*2,_yscale*2*2)
+    end
+
+    -- pineapple
+    if G.GAME.modifiers.yahimod_pineapple and not G.SETTINGS.paused then
+        --love.graphics.print("ticks:" .. Yahimod.ticks, 500, 35)
+        if Yahimod.pineapplepng == nil then Yahimod.pineapplepng = loadThatFuckingImage("pineapple.png") end
+        love.graphics.setColor(1, 1, 1, 1) 
+        love.graphics.draw(Yahimod.pineapplepng, 0*_xscale*2, 0*_yscale*2,0,_xscale*2*2,_yscale*2*2)
     end
 
     -- cantaloupe
@@ -6144,6 +6252,23 @@ function calculate_jack_amount()
         end
     end
     return count
+end
+
+function calculate_achievements()
+    local count = 0
+    local ACH = (smods and smods.achievements) or (SMODS and SMODS.Achievements) or {}
+    local total, earned = 0, 0
+    local needle = "ach_yahimod"
+
+    for key, ach in pairs(ACH) do
+        if type(key) == "string" and key:sub(1, #needle) == needle then
+            total = total + 1
+            if ach and ach.earned == true then
+                earned = earned + 1
+            end
+        end
+    end
+    return earned
 end
 
 -- from cryptid/items/misc_joker.lua

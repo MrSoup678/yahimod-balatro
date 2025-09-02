@@ -29,4 +29,23 @@ return {
                 test_jerma = "jerma loc txt",
             },
         },
+    Stake = {
+            yahimod_stake_camel = {
+                name = "Camel Stake",
+                text = {
+                    'Cards can have a',
+                    'Made in Morocco sticker'
+                },
+            },
+        },
+    Sticker = {
+            yahimod_sticker_madeinmorocco = {
+                name = "Made In Morocco",
+                text = {
+                    'Card costs $2 but will',
+                    'self-destruct 2 turns after',
+                    'being bought'
+                },
+            },
+        },
 }
