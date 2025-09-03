@@ -308,6 +308,22 @@ SMODS.current_mod.optional_features = {
 
 G.effectmanager = {}
 
+
+-- safe json decoder
+local function safe_json_decode(str)
+    if type(str) ~= "string" or str == "" then
+        return nil, "empty body"
+    end
+    local ok, result = pcall(json.decode, str)
+    if ok then
+        return result
+    else
+        return nil, result
+    end
+end
+
+
+
 --get twitch numbers
 
 G.last_update_time = 0
@@ -320,6 +336,9 @@ function recheckTwitch(please)
         local url = "https://gql.twitch.tv/gql"
         local options = {
         method = "POST",
+
+        
+
         data = '[{"operationName":"VideoMetadata","variables":{"channelLogin":"Yahiamice","videoID":"0"},"extensions":{"persistedQuery":{"version":1,"sha256Hash":"45111672eea2e507f8ba44d101a61862f9c56b11dee09a15634cb75cb9b9084d"}}}]',
         headers = {
             ["Client-ID"] = "kimne78kx3ncx6brgo4mv6wki5h1ko",
@@ -329,6 +348,15 @@ function recheckTwitch(please)
         }
 
         local status, body, headers = https.request(url, options)
+
+        local ok, parsed = pcall(json.decode, body or "")
+        if not ok or type(parsed) ~= "table" then
+            G.yahifollowers = 67000
+            G.yahiviewers = 0
+            print("Couldn't JSON decode for some reason. Check your VPN?")
+            return 
+        end
+
         G.twitchbodyjson = json.decode(body)
         G.yahifollowers = G.twitchbodyjson[1].data.user.followers.totalCount
         G.yahiviewers = 0
