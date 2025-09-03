@@ -2062,7 +2062,7 @@ SMODS.Joker{
         end
 
         if context.cardarea == G.play and context.individual and #G.play.cards == 1 and G.GAME.current_round.hands_played == 0 then
-            context.other_card.seal = "yahimod_whatsapp_seal"
+            context.other_card:set_seal("yahimod_whatsapp_seal",true,true)
             return {
                         message = "Whatsapp-ified!",
                         card = card,
@@ -2123,8 +2123,8 @@ SMODS.Joker{
             table.remove(_eligiblecards,_pickedid)
             local _picked2 = _eligiblecards[math.random(#_eligiblecards)]
             play_sound("yahimod_whatsapp")
-            G.hand.cards[_picked1].seal = "yahimod_whatsapp_seal"
-            G.hand.cards[_picked2].seal = "yahimod_whatsapp_seal"
+            G.hand.cards[_picked1]:set_seal("yahimod_whatsapp_seal",true,true)
+            G.hand.cards[_picked2]:set_seal("yahimod_whatsapp_seal",true,true)
         else
             return{
                 message = "How the fuck do you want me to do this"

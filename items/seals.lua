@@ -209,7 +209,7 @@ SMODS.Seal {
                 repetitions = 1,
                 G.E_MANAGER:add_event(Event({func = function()
                 if pseudorandom('ifunny') < (G.GAME.probabilities.normal / 3) then 
-                    card.seal = nil 
+                    card:set_seal(nil,true,true)
                     card_eval_status_text(card,'extra',nil,nil,nil,{message = "Cropped!"})
                     play_sound("cardFan2")
                 end

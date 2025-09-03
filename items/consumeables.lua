@@ -422,7 +422,7 @@ SMODS.Consumable {
                 return true end }))
             
             G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.1,func = function()
-                G.hand.highlighted[i].seal = "yahimod_whatsapp_seal"
+                G.hand.highlighted[i]:set_seal("yahimod_whatsapp_seal",true,true)
                 return true end }))
             
             delay(0.5)
@@ -513,7 +513,7 @@ SMODS.Consumable {
                 return true end }))
             
             G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.1,func = function()
-                G.hand.highlighted[i].seal = "yahimod_ifunny_seal"
+                G.hand.highlighted[i]:set_seal("yahimod_ifunny_seal",true,true)
                 return true end }))
             
             delay(0.5)
@@ -686,7 +686,7 @@ SMODS.Consumable {
                 return true end }))
             
             G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.1,func = function()
-                G.hand.highlighted[i].seal = "yahimod_swapper_seal"
+                G.hand.highlighted[i]:set_seal("yahimod_swapper_seal",true,true)
                 return true end }))
             
             delay(0.5)

@@ -80,7 +80,7 @@ SMODS.Blind {
         for i = 1, #G.play.cards do
             if G.play.cards[i].seal == nil then
                 SMODS.juice_up_blind()
-                G.play.cards[i].seal = "yahimod_horse_seal"
+                G.play.cards[i]:set_seal("yahimod_horse_seal",true,true)
                 play_sound("yahimod_horse")
                 delay(0.3)
             end
@@ -290,7 +290,7 @@ SMODS.Blind {
         for i = 1, #G.play.cards do
             if G.play.cards[i].seal == nil then
                 SMODS.juice_up_blind()
-                G.play.cards[i].seal = "yahimod_horse_seal"
+                G.play.cards[i]:set_seal("yahimod_horse_seal",true,true)
                 play_sound("yahimod_horse")
                 delay(0.3)
             end
