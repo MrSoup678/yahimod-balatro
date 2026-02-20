@@ -60,7 +60,7 @@ SMODS.Joker{
         end
     end,
 
-    in_pool = function(self,wawa,wawa2)
+    in_pool = function(self,wawa)
         --whether or not this card is in the pool, return true if it is, return false if its not
         return true
     end,
@@ -3897,7 +3897,7 @@ G.FUNCS.evaluate_play = function(e)
     G.haltevaleventsent = nil
     G.haltingevaluation = nil
 
-end,
+end
 
 
 SMODS.Joker{
@@ -5896,13 +5896,6 @@ function Game:update(dt)
             
 
         for i = 1, #G.jokers.cards do
-            -- LC Sliced check
-            if G.jokers.cards[i].getting_sliced == true and not G.hasajokerbeendestroyedthistick == true then
-                G.hasajokerbeendestroyedthistick = true
-                return {
-                    --print("found a joker being destroyed! adding Mult")
-                }
-            end
             -- horse needs eternal sticker
             if G.jokers.cards[i].ability.name == 'j_yahimod_horsewalksin' then
                 local _horse = G.jokers.cards[i]
