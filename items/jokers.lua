@@ -115,12 +115,17 @@ SMODS.Joker{
 			}
 		end
         if context.individual and context.cardarea == G.play and context.other_card.ability.name == 'Lucky Card' and not context.other_card.lucky_trigger then
-            card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.additional
+            --card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.additional
+            SMODS.scale_card(card,{
+                ref_table = card.ability.extra,
+                ref_value = "Xmult",
+                scalar_value = "additional",
+                scaling_message = {
+                    message = "Unlucky!",
+                    colour = G.C.RED
+                }
+            })
             if card.ability.extra.Xmult >= 3 then check_for_unlock({ type = "ach_marxblep" }) end
-            return {
-                message = "Unlucky!",
-                colour = G.C.RED
-            }
         end
         if context.individual and context.other_card.lucky_trigger then
             card.ability.extra.Xmult = 1
@@ -188,29 +193,31 @@ SMODS.Joker{
 		end
         if context.remove_playing_cards then
             for k, val in ipairs(context.removed) do
-                card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.additional
-                return {
-                    message = "BOOM!",
-                    colour = G.C.RED
-                }
+                SMODS.scale_card(card,{
+                    ref_table = card.ability.extra,
+                    ref_value = "Xmult",
+                    scalar_value = "additional",
+                    scaling_message = {
+                        message = "BOOM!",
+                        colour = G.C.RED
+                    }
+                })
             end
         end
 
-        if G.hasajokerbeendestroyedthistick == true then
-            G.hasajokerbeendestroyedthistick = false
-            card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.additional
-            return {
-                message = "BOOM!",
-                colour = G.C.RED 
-            }
+        if context.joker_type_destroyed and context.card.ability.set == "Joker" then
+                sendDebugMessage("LC " .. context.card.ability.name, "YAHILOG")
+            SMODS.scale_card(card,{
+                    ref_table = card.ability.extra,
+                    ref_value = "Xmult",
+                    scalar_value = "additional",
+                    scaling_message = {
+                        message = "BOOM!",
+                        colour = G.C.RED
+                    }
+                })
         end
 
-        if context.using_consumeable then
-            if context.consumeable.ability.name == 'Hex' or context.consumeable.ability.name == 'Ankh' then
-                G.hasajokerbeendestroyedthistick = true
-            end
-            --print("LC" .. context.consumeable.ability.name)
-        end
 
     end,
 
@@ -833,10 +840,15 @@ SMODS.Joker{
 			}
         end
         if context.setting_blind then
-            card.ability.extra.mult = card.ability.extra.mult + card.ability.extra.additional
-            return {
-                message = "Upgrade!",
-            }
+            --card.ability.extra.mult = card.ability.extra.mult + card.ability.extra.additional
+            --return {
+            --    message = "Upgrade!",
+            --}
+            SMODS.scale_card(card,{
+                ref_table = card.ability.extra,
+                ref_value = "mult",
+                scalar_value = "additional"
+            })
         end
     end,
 
@@ -890,10 +902,11 @@ SMODS.Joker{
 			}
         end
         if context.setting_blind then
-            card.ability.extra.chips = card.ability.extra.chips + card.ability.extra.additional
-            return {
-                message = "Upgrade!",
-            }
+            SMODS.scale_card(card,{
+                ref_table = card.ability.extra,
+                ref_value = "chips",
+                scalar_value = "additional"
+            })
         end
     end,
 
@@ -1127,10 +1140,11 @@ SMODS.Joker{
         end
         if context.setting_blind then
             if pseudorandom('sisyphus') < (G.GAME.probabilities.normal / card.ability.extra.chance) then
-                card.ability.extra.xmult = card.ability.extra.xmult + card.ability.extra.additional
-                return {
-                    message = "Upgrade!",
-                }
+                SMODS.scale_card(card,{
+                    ref_table = card.ability.extra,
+                    ref_value = "mult",
+                    scalar_value = "additional"
+                })
             else
                 card.ability.extra.xmult = 1
                 return {
@@ -3409,11 +3423,16 @@ SMODS.Joker{
         if context.setting_blind then
             if _myid == #G.jokers.cards and G.consumeables.cards[1] then
                 G.consumeables.cards[1]:start_dissolve()
-                card.ability.extra.multtotal = card.ability.extra.multtotal + card.ability.extra.multamt
+                SMODS.scale_card(card,{
+                    ref_table = card.ability.extra,
+                    ref_value = "multtotal",
+                    scalar_value = "multamt",
+                    scaling_message = {
+                        message = "Slice!",
+                        sound = "slice1"
+                    }
+                })
                 if card.ability.extra.multtotal >= card.ability.extra.multamt*8 then check_for_unlock({ type = "ach_katana" }) end
-                return{message = "Slice!",
-                sound = "slice1",
-                }
             end
         elseif context.joker_main then
             return {
@@ -4388,17 +4407,23 @@ SMODS.Joker{
 
         local _myid = getJokerID(card)
         if context.before and next(context.poker_hands['Flush']) then
-            card.ability.extra.multtotal = card.ability.extra.multtotal + card.ability.extra.multamt
-            return {
-                message = "Pluh!",
-                sound = "yahimod_pluhsh"
-            }
+            SMODS.scale_card(card,{
+                ref_table = card.ability.extra,
+                ref_value = "multtotal",
+                scalar_value = "multamt",
+                scaling_message = {
+                    message = "Pluh!",
+                    sound = "yahimod_pluhsh"
+                },
+            })
         end
         if context.joker_main and card.ability.extra.multtotal > 0 then
             if string.find(G.GAME.current_round.current_hand.handname,"Straight Plush") then check_for_unlock({ type = "ach_straightplush" }) end
             return {
                 mult = card.ability.extra.multtotal,
-                sound = "yahimod_pluh",
+                message ={
+                    sound = "yahimod_pluh",
+                } ,
             }
         end
     end,
@@ -4987,10 +5012,14 @@ SMODS.Joker{
 
         local _myid = getJokerID(card)
         if context.before and next(context.poker_hands['Pair']) then
-            card.ability.extra.multtotal = card.ability.extra.multtotal + card.ability.extra.multamt
-            return {
-                message = "Teto!",
+           SMODS.scale_card(card,{
+            ref_table = card.ability.extra,
+            ref_value = "multtotal",
+            scalar_value = "multamt",
+            scaling_message = {
+                message = "Teto!"
             }
+           })
         end
         if context.joker_main and card.ability.extra.multtotal > 0 then
             return {
@@ -5162,11 +5191,14 @@ SMODS.Joker{
     
     calculate = function(self, card, context)
         if context.before and next(context.poker_hands['yahimod_pkr_jerma']) then
-            card.ability.extra.multtotal = card.ability.extra.multtotal + card.ability.extra.multamt
-            return {
-                message = "Upgrade!",
-                sound = "yahimod_jermanoise",
-            }
+           SMODS.scale_card(card,{
+                ref_table = card.ability.extra,
+                ref_value = "multamt",
+                scalar_value = "multtotal",
+                scaling_message = {
+                    sound = "yahimod_jermanoise"
+                }
+            })
         end
         if context.joker_main and card.ability.extra.multtotal > 0 then
             return {
@@ -5222,7 +5254,7 @@ SMODS.Joker{
     
     calculate = function(self, card, context)
         if context.before and #G.play.cards == 5 then
-            SMODS.change_base(G.play.cards[5], G.play.cards[1].base.suit)
+            assert(SMODS.change_base(G.play.cards[5], G.play.cards[1].base.suit))
             return {
                 message = "Meow!",
             }
