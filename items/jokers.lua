@@ -4421,8 +4421,11 @@ SMODS.Joker{
             if string.find(G.GAME.current_round.current_hand.handname,"Straight Plush") then check_for_unlock({ type = "ach_straightplush" }) end
             return {
                 mult = card.ability.extra.multtotal,
-                message ={
+                --basically had to replace this just for the sound, can you imagine it?
+                mult_message = {
+                    message = localize({type='variable',key='a_mult',vars = {card.ability.extra.multtotal}}),
                     sound = "yahimod_pluh",
+                    colour = G.C.MULT
                 } ,
             }
         end
