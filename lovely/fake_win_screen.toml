@@ -1,0 +1,65 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = -500
+
+
+
+
+
+#G.FUNCS.exit_overlay_menu()
+[[patches]]
+[patches.pattern]
+target = "functions/button_callbacks.lua"
+pattern = '''
+G.CONTROLLER:mod_cursor_context_layer(-1000)
+  G.OVERLAY_MENU:remove()
+  G.OVERLAY_MENU = nil
+  G.VIEWING_DECK = nil
+  G.SETTINGS.paused = false
+'''
+position = "after"
+payload = '''
+  --we don't want to run this during horse blinds.
+  if G.showlaughingcat and G.showlaughingcat >0 then return end
+'''
+match_indent = false
+
+
+
+#create_UIBox_win()
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = '''
+    {n=G.UIT.C, config={align = "tr", padding = 0.08}, nodes={
+        create_UIBox_round_scores_row('furthest_ante', G.C.FILTER),
+        create_UIBox_round_scores_row('furthest_round', G.C.FILTER),
+        {n=G.UIT.R, config={align = "cm", minh = 0.4, minw = 0.1}, nodes={}},
+        show_win_cta and UIBox_button({id = 'win_cta', button = 'show_main_cta', label = {localize('b_next')}, colour = G.C.GREEN, scale = 0.8, minw = 2.5, minh = 2.5, focus_args = {nav = 'wide', snap_to = true}}) or nil,
+        not show_win_cta and UIBox_button({id = 'from_game_won', button = 'notify_then_setup_run', label = {localize('b_start_new_run')}, minw = 2.5, maxw = 2.5, minh = 1, focus_args = {nav = 'wide', snap_to = true}}) or nil,
+        not show_win_cta and {n=G.UIT.R, config={align = "cm", minh = 0.2, minw = 0.1}, nodes={}} or nil,
+        not show_win_cta and UIBox_button({button = 'go_to_menu', label = {localize('b_main_menu')}, minw = 2.5, maxw = 2.5, minh = 1, focus_args = {nav = 'wide'}}) or nil,
+      }}
+    }},
+    {n=G.UIT.R, config={align = "cm", padding = 0.08}, nodes={
+      UIBox_button({button = 'exit_overlay_menu', label = {localize('b_endless')}, minw = 6.5, maxw = 5, minh = 1.2, scale = 0.7, shadow = true, colour = G.C.BLUE, focus_args = {nav = 'wide', button = 'x',set_button_pip = true}}),
+    }},
+'''
+position = "at"
+payload = '''
+    {n=G.UIT.C, config={align = "tr", padding = 0.08}, nodes={
+        create_UIBox_round_scores_row('furthest_ante', G.C.FILTER),
+        create_UIBox_round_scores_row('furthest_round', G.C.FILTER),
+        {n=G.UIT.R, config={align = "cm", minh = 0.4, minw = 0.1}, nodes={}},
+        show_win_cta and UIBox_button({id = 'win_cta', button = (G.showlaughingcat and G.showlaughingcat >0) and 'fake_win_button' or 'show_main_cta', label = {localize('b_next')}, colour = G.C.GREEN, scale = 0.8, minw = 2.5, minh = 2.5, focus_args = {nav = 'wide', snap_to = true}}) or nil,
+        not show_win_cta and UIBox_button({id = 'from_game_won', button = (G.showlaughingcat and G.showlaughingcat >0) and 'fake_win_button' or 'notify_then_setup_run', label = {localize('b_start_new_run')}, minw = 2.5, maxw = 2.5, minh = 1, focus_args = {nav = 'wide', snap_to = true}}) or nil,
+        not show_win_cta and {n=G.UIT.R, config={align = "cm", minh = 0.2, minw = 0.1}, nodes={}} or nil,
+        not show_win_cta and UIBox_button({button = (G.showlaughingcat and G.showlaughingcat >0) and 'fake_win_button' or 'go_to_menu', label = {localize('b_main_menu')}, minw = 2.5, maxw = 2.5, minh = 1, focus_args = {nav = 'wide'}}) or nil,
+      }}
+    }},
+    {n=G.UIT.R, config={align = "cm", padding = 0.08}, nodes={
+      UIBox_button({button = (G.showlaughingcat and G.showlaughingcat >0) and 'fake_win_button' or 'exit_overlay_menu', label = {localize('b_endless')}, minw = 6.5, maxw = 5, minh = 1.2, scale = 0.7, shadow = true, colour = G.C.BLUE, focus_args = {nav = 'wide', button = 'x',set_button_pip = true}}),
+    }},
+'''
+match_indent = false

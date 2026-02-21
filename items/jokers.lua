@@ -6115,13 +6115,19 @@ function love.draw()
     if G.showlaughingcat and (G.showlaughingcat > 0) then
         --love.graphics.print("ticks:" .. Yahimod.ticks, 500, 35)
         if G.showlaughingcat < (547) then
+            if (G.showlaughingcat == 546) then G.FUNCS.exit_overlay_menu() end --do not fire that shit 547 times thank you
             if Yahimod.catlaughingpng == nil then Yahimod.catlaughingpng = loadThatFuckingImage("catlaughing.png") end
             love.graphics.setColor(1, 1, 1, 1) 
             love.graphics.draw(Yahimod.catlaughingpng, 0*_xscale*2, 0*_yscale*2,0,_xscale*2*2,_yscale*2*2)
-        else
-            if Yahimod.youwinpng == nil then Yahimod.youwinpng = loadThatFuckingImage("youwin.png") end
-            love.graphics.setColor(1, 1, 1, 1) 
-            love.graphics.draw(Yahimod.youwinpng, 875*_xscale*2/2, 90*_xscale*2/2,0,_xscale*2/2,_yscale*2/2)
+        else if G.showlaughingcat == 989 then
+            --if Yahimod.youwinpng == nil then Yahimod.youwinpng = loadThatFuckingImage("youwin.png") end
+            --love.graphics.setColor(1, 1, 1, 1) 
+            --love.graphics.draw(Yahimod.youwinpng, 875*_xscale*2/2, 90*_xscale*2/2,0,_xscale*2/2,_yscale*2/2)
+            --TODO: patch create_UIBox_win if the fake needs to be convincing, or alter its composition here.
+            
+            
+            
+        end
         end
     end
 

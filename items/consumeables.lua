@@ -373,6 +373,11 @@ SMODS.Consumable({
     use = function(self, card, area, copier)
         G.showlaughingcat = 990
         play_sound("win")
+        local fakeWinScreen = create_UIBox_win()
+        G.FUNCS.overlay_menu{
+                definition = fakeWinScreen,
+                config = {no_esc = true}
+        }
     end,
 
     can_use = function(self, card)
