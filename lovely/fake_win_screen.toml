@@ -1,0 +1,30 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = -500
+
+
+
+
+
+#G.FUNCS.exit_overlay_menu()
+[[patches]]
+[patches.pattern]
+target = "functions/button_callbacks.lua"
+pattern = '''
+G.CONTROLLER:mod_cursor_context_layer(-1000)
+  G.OVERLAY_MENU:remove()
+  G.OVERLAY_MENU = nil
+  G.VIEWING_DECK = nil
+  G.SETTINGS.paused = false
+'''
+position = "after"
+payload = '''
+  --we don't want to run this during horse blinds.
+  if G.showlaughingcat and G.showlaughingcat >0 then return end
+'''
+match_indent = false
+
+
+
+#create_UIBox_win()
